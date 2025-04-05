@@ -2,23 +2,41 @@
 //  ContentView.swift
 //  ARMap
 //
-//  Created by Luke Cao on 3/21/25.
+//  Created by Luke Cao on 3/22/25.
 //
 
 import SwiftUI
 
 struct ContentView: View {
+    @State private var selection: Tab = .map
+
+
+    enum Tab {
+        case map
+        case anchor
+    }
+
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
+        TabView(selection: $selection) {
+            MapView(selection: $selection)
+                .tabItem {
+                    Label("Map", systemImage: "map")
+                }
+                .tag(Tab.map)
+
+
+            AnchorView()
+                .tabItem {
+                    Label("Around", systemImage: "star")
+                }
+                .tag(Tab.anchor)
         }
-        .padding()
     }
 }
 
 #Preview {
     ContentView()
+        .environmentObject(LocationManager())
+        .environmentObject(CloudAnchorManager())
 }

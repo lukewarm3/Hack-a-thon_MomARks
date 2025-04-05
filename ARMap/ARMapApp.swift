@@ -8,10 +8,15 @@
 import SwiftUI
 
 @main
-struct ARMapApp: App {
-    var body: some Scene {
-        WindowGroup {
-            ContentView()
-        }
+struct MainApp: App {
+  @StateObject private var manager = CloudAnchorManager()
+  @StateObject private var locationManager = LocationManager()
+    
+  var body: some Scene {
+    WindowGroup {
+      ContentView()
+        .environmentObject(locationManager)
+        .environmentObject(manager)
     }
+  }
 }

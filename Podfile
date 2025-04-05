@@ -1,0 +1,4 @@
+target 'ARMap'
+use_frameworks!
+platform :ios, '17.0'
+pod 'ARCore/CloudAnchors', '~> 1.48.0'
