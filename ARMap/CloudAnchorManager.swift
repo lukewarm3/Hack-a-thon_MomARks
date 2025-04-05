@@ -14,7 +14,7 @@ import simd
 class CloudAnchorManager: ObservableObject {
   private enum Constants {
     /// Fill in your own API Key here.
-    static let apiKey = "AIzaSyAr5FGipo37nctOkLPoV2qXLK0rrKyHU74"
+    static let apiKey = "api-key-here"
     /// User defaults key for storing anchor creation timestamps.
     static let timeDictionaryUserDefaultsKey = "NicknameTimeStampDictionary"
     /// User defaults key for storing anchor IDs.
