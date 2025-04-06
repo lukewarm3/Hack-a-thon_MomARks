@@ -42,10 +42,12 @@ struct ResolvePickerView: View {
           return
       }
       
-      anchorInfos = manager.fetchAndPruneAnchors(
+      manager.fetchAndPruneAnchors(
           currentlatitude: currentLocation.coordinate.latitude,
           currentlongitude: currentLocation.coordinate.longitude
-      )
+      ) { info in
+          anchorInfos = info
+      }
 
       // Remove any anchor IDs from selection that are no longer in the list.
       anchorIdSelection = Set(
@@ -122,3 +124,10 @@ struct ResolvePickerView: View {
     }
   }
 }
+
+#Preview {
+    ResolvePickerView()
+        .environmentObject(CloudAnchorManager())
+        .environmentObject(LocationManager())
+}
+

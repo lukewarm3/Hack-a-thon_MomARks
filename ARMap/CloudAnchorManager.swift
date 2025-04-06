@@ -9,12 +9,13 @@ import ARCore
 import ARKit
 import RealityKit
 import simd
+import FirebaseFirestore
 
 /// Model object for hosting and resolving Cloud Anchors.
 class CloudAnchorManager: ObservableObject {
   private enum Constants {
     /// Fill in your own API Key here.
-    static let apiKey = "api-key-here"
+    static let apiKey = "AIzaSyAr5FGipo37nctOkLPoV2qXLK0rrKyHU74"
     /// User defaults key for storing anchor creation timestamps.
     static let timeDictionaryUserDefaultsKey = "NicknameTimeStampDictionary"
     /// User defaults key for storing anchor IDs.
@@ -274,80 +275,165 @@ class CloudAnchorManager: ObservableObject {
     guard let anchorId = hostFuture?.resultCloudIdentifier, !anchorNameDialogField.isEmpty else {
       return
     }
+//    var timeDictionary =
+//      (UserDefaults.standard.dictionary(forKey: Constants.timeDictionaryUserDefaultsKey)
+//        as? [String: Date]) ?? [:]
+//    var anchorInfoDictionary =
+//      (UserDefaults.standard.dictionary(forKey: anchorInfoDictionaryUserDefaultsKey)
+//       as? [String: [String: Any]]) ?? [:]
+//    timeDictionary[anchorId] = Date()
+//    
+//    let imageKey = CustomAnchorModelUtil.imageKeyForAnchor(anchorID: anchorId)
+//
+//      let info: [String: Any] = [
+//        "name": anchorNameDialogField,
+//        "description": anchorDescriptionDialogField,
+//        "latitude": latitude,
+//        "longitude": longitude,
+//        "imageKey": imageKey
+//      ]
+//
+//    // Save the image data to UserDefaults
+//    CustomAnchorModelUtil.saveImageDataToUserDefaults(imageData: imageData, forKey: imageKey)
+//      
+//    anchorInfoDictionary[anchorId] = info
+//    UserDefaults.standard.setValue(timeDictionary, forKey: Constants.timeDictionaryUserDefaultsKey)
+//    UserDefaults.standard.setValue(
+//      anchorInfoDictionary, forKey: anchorInfoDictionaryUserDefaultsKey)
+      let db = Firestore.firestore()
+      let imageKey = CustomAnchorModelUtil.imageKeyForAnchor(anchorID: anchorId)
       
-    var timeDictionary =
-      (UserDefaults.standard.dictionary(forKey: Constants.timeDictionaryUserDefaultsKey)
-        as? [String: Date]) ?? [:]
-    var anchorInfoDictionary =
-      (UserDefaults.standard.dictionary(forKey: anchorInfoDictionaryUserDefaultsKey)
-       as? [String: [String: Any]]) ?? [:]
-    timeDictionary[anchorId] = Date()
-    
-    let imageKey = CustomAnchorModelUtil.imageKeyForAnchor(anchorID: anchorId)
-
-      let info: [String: Any] = [
+      // save the image
+      CustomAnchorModelUtil.saveImageDataToUserDefaults(imageData: imageData, forKey: imageKey)
+      
+      let data: [String: Any] = [
         "name": anchorNameDialogField,
         "description": anchorDescriptionDialogField,
         "latitude": latitude,
         "longitude": longitude,
-        "imageKey": imageKey
+        "imageKey": imageKey,
+        "createdAt": Timestamp(date: Date())
       ]
-
-    // Save the image data to UserDefaults
-    CustomAnchorModelUtil.saveImageDataToUserDefaults(imageData: imageData, forKey: imageKey)
       
-    anchorInfoDictionary[anchorId] = info
-    UserDefaults.standard.setValue(timeDictionary, forKey: Constants.timeDictionaryUserDefaultsKey)
-    UserDefaults.standard.setValue(
-      anchorInfoDictionary, forKey: anchorInfoDictionaryUserDefaultsKey)
+      db.collection("anchors").document(anchorId).setData(data) {error in
+          if let error = error {
+              print("Error saving anchor: \(error.localizedDescription)")
+          } else {
+              print("Anchor saved successfully")
+          }
+      }
   }
 
   /// Gets the list of stored anchors, sorted by age, and removes any more than a day old and too far from me (1 km away from me).
-    func fetchAndPruneAnchors(currentlatitude: Double, currentlongitude: Double) -> [Place] {
-        var timeDictionary =
-          (UserDefaults.standard.dictionary(forKey: Constants.timeDictionaryUserDefaultsKey)
-            as? [String: Date]) ?? [:]
-        var anchorInfoDictionary =
-          (UserDefaults.standard.dictionary(forKey: anchorInfoDictionaryUserDefaultsKey)
-            as? [String: [String: Any]]) ?? [:]
+    func fetchAndPruneAnchors(currentlatitude: Double, currentlongitude: Double, completion: @escaping ([Place]) -> Void){
+//        var timeDictionary =
+//          (UserDefaults.standard.dictionary(forKey: Constants.timeDictionaryUserDefaultsKey)
+//            as? [String: Date]) ?? [:]
+//        var anchorInfoDictionary =
+//          (UserDefaults.standard.dictionary(forKey: anchorInfoDictionaryUserDefaultsKey)
+//            as? [String: [String: Any]]) ?? [:]
+//        
+//        var infos: [Place] = []
+//        let now = Date()
+//        let currentLocation = CLLocation(latitude: currentlatitude, longitude: currentlongitude)
+//
+//        for (id, time) in timeDictionary.sorted(by: { $0.1.compare($1.1) == .orderedDescending }) {
+//            let timeInterval = now.timeIntervalSince(time)
+//
+//            // Prune if over 1 day old
+//            if timeInterval >= 86400 {
+//                timeDictionary.removeValue(forKey: id)
+//                anchorInfoDictionary.removeValue(forKey: id)
+//                continue
+//            }
+//
+//            guard let info = anchorInfoDictionary[id] else { continue }
+//            guard let name = info["name"] as? String else { continue }
+//            guard let description = info["description"] as? String else { continue }
+//            guard let lat = info["latitude"] as? Double,
+//                  let lon = info["longitude"] as? Double else { continue }
+//
+//            let anchorLocation = CLLocation(latitude: lat, longitude: lon)
+//            let distance = currentLocation.distance(from: anchorLocation)
+//
+//            // 💡 Only include anchors within 1km (1000 meters)
+//            guard distance <= 1000 else { continue }
+//
+//            let age = timeInterval >= 3600
+//                ? "\(Int(floor(timeInterval / 3600)))h"
+//                : "\(Int(floor(timeInterval / 60)))m"
+//
+//            infos.append(Place(id: id, name: name, age: age, description: description, latitude: lat, longitude: lon))
+//        }
+//
+//        UserDefaults.standard.setValue(timeDictionary, forKey: Constants.timeDictionaryUserDefaultsKey)
+//        UserDefaults.standard.setValue(anchorInfoDictionary, forKey: anchorInfoDictionaryUserDefaultsKey)
+//        
+//        return infos
         
-        var infos: [Place] = []
-        let now = Date()
+        // refactor the code to firebase db
+        let db = Firestore.firestore()
         let currentLocation = CLLocation(latitude: currentlatitude, longitude: currentlongitude)
-
-        for (id, time) in timeDictionary.sorted(by: { $0.1.compare($1.1) == .orderedDescending }) {
-            let timeInterval = now.timeIntervalSince(time)
-
-            // Prune if over 1 day old
-            if timeInterval >= 86400 {
-                timeDictionary.removeValue(forKey: id)
-                anchorInfoDictionary.removeValue(forKey: id)
-                continue
-            }
-
-            guard let info = anchorInfoDictionary[id] else { continue }
-            guard let name = info["name"] as? String else { continue }
-            guard let description = info["description"] as? String else { continue }
-            guard let lat = info["latitude"] as? Double,
-                  let lon = info["longitude"] as? Double else { continue }
-
-            let anchorLocation = CLLocation(latitude: lat, longitude: lon)
-            let distance = currentLocation.distance(from: anchorLocation)
-
-            // 💡 Only include anchors within 1km (1000 meters)
-            guard distance <= 1000 else { continue }
-
-            let age = timeInterval >= 3600
-                ? "\(Int(floor(timeInterval / 3600)))h"
-                : "\(Int(floor(timeInterval / 60)))m"
-
-            infos.append(Place(id: id, name: name, age: age, description: description, latitude: lat, longitude: lon))
-        }
-
-        UserDefaults.standard.setValue(timeDictionary, forKey: Constants.timeDictionaryUserDefaultsKey)
-        UserDefaults.standard.setValue(anchorInfoDictionary, forKey: anchorInfoDictionaryUserDefaultsKey)
+        let now = Date()
         
-        return infos
+        db.collection("anchors").getDocuments { snapshot, error in
+                var infos: [Place] = []
+
+                if let error = error {
+                    print("Error fetching anchors: \(error.localizedDescription)")
+                    completion([])
+                    return
+                }
+
+                guard let documents = snapshot?.documents else {
+                    completion([])
+                    return
+                }
+
+                let batch = db.batch()  // For pruning old/out-of-range anchors
+
+                for document in documents {
+                    let data = document.data()
+                    guard let name = data["name"] as? String,
+                          let description = data["description"] as? String,
+                          let lat = data["latitude"] as? Double,
+                          let lon = data["longitude"] as? Double,
+                          let createdAt = data["createdAt"] as? Timestamp else {
+                        continue
+                    }
+
+                    let timeInterval = now.timeIntervalSince(createdAt.dateValue())
+
+                    // Prune if older than 3 days
+                    if timeInterval >= 86400 * 3 {
+                        batch.deleteDocument(document.reference)
+                        continue
+                    }
+
+                    let anchorLocation = CLLocation(latitude: lat, longitude: lon)
+                    let distance = currentLocation.distance(from: anchorLocation)
+
+                    // Prune if farther than 1km
+                    if distance > 1000 {
+                        continue
+                    }
+
+                    let age = timeInterval >= 3600
+                        ? "\(Int(floor(timeInterval / 3600)))h"
+                        : "\(Int(floor(timeInterval / 60)))m"
+
+                    infos.append(Place(id: document.documentID, name: name, age: age, description: description, latitude: lat, longitude: lon))
+                }
+
+                // Commit pruning changes
+                batch.commit { err in
+                    if let err = err {
+                        print("Error pruning anchors: \(err.localizedDescription)")
+                    }
+                }
+
+                completion(infos)
+            }
     }
 
   private static func string(from cloudState: GARCloudAnchorState) -> String {

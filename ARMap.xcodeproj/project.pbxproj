@@ -7,13 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		00C6A0C62D8F8BE500A67368 /* Untitled.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00C6A0C52D8F89C400A67368 /* Untitled.swift */; };
 		08C210AE9B2AF4CBDB68A387 /* Pods_ARMap.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3888313DE2D67AF5C9800375 /* Pods_ARMap.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		00C6A0342D8E248F00A67368 /* ARMap.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ARMap.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		00C6A0C52D8F89C400A67368 /* Untitled.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Untitled.swift; sourceTree = "<group>"; };
 		3888313DE2D67AF5C9800375 /* Pods_ARMap.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ARMap.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		7EF57C4F4E2DFA357AB19EF7 /* Pods-ARMap.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ARMap.release.xcconfig"; path = "Target Support Files/Pods-ARMap/Pods-ARMap.release.xcconfig"; sourceTree = "<group>"; };
 		9E15235B12F07A0220BFDC8E /* Pods-ARMap.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ARMap.debug.xcconfig"; path = "Target Support Files/Pods-ARMap/Pods-ARMap.debug.xcconfig"; sourceTree = "<group>"; };
@@ -42,7 +40,6 @@
 		00C6A02B2D8E248F00A67368 = {
 			isa = PBXGroup;
 			children = (
-				00C6A0C52D8F89C400A67368 /* Untitled.swift */,
 				00C6A0362D8E248F00A67368 /* ARMap */,
 				00C6A0352D8E248F00A67368 /* Products */,
 				61FD93104BE60DE287ACCCBB /* Pods */,
@@ -86,7 +83,6 @@
 				00C6A0302D8E248F00A67368 /* Sources */,
 				00C6A0312D8E248F00A67368 /* Frameworks */,
 				00C6A0322D8E248F00A67368 /* Resources */,
-				4AC17F674AD8AA7DBBAE8801 /* [CP] Embed Pods Frameworks */,
 				7DADFFBF56AE26087349C723 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
@@ -146,23 +142,6 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		4AC17F674AD8AA7DBBAE8801 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ARMap/Pods-ARMap-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ARMap/Pods-ARMap-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ARMap/Pods-ARMap-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
 		7DADFFBF56AE26087349C723 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -209,7 +188,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				00C6A0C62D8F8BE500A67368 /* Untitled.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -27,37 +27,39 @@ struct MapView: View {
             return
         }
         
-        places = manager.fetchAndPruneAnchors(
+        manager.fetchAndPruneAnchors(
             currentlatitude: currentLocation.coordinate.latitude,
             currentlongitude: currentLocation.coordinate.longitude
-        )
-        
-        places = [
-            Place(
-                id: "1",
-                name: "Duncan Student Center",
-                age: "30m",
-                description: "This is the Duncan Student Center.",
-                latitude: 41.69878133392592,
-                longitude: -86.23516434558917
-            ),
-            Place(
-                id: "2",
-                name: "Hesburgh Library",
-                age: "30m",
-                description: "I am taking Hackathon Competition here!",
-                latitude: 41.70258141723964,
-                longitude: -86.23419551824554
-            ),
-            Place(
-                id: "3",
-                name: "Starbucks",
-                age: "30m",
-                description: "The Iced Hazelnut Oatmilk Shaken Espresso is my favorite!",
-                latitude: 41.702084780632184,
-                longitude: -86.23757510148786
-            ),
-        ]
+        ) { info in
+            places = info
+            
+            places = [
+                Place(
+                    id: "1",
+                    name: "Duncan Student Center",
+                    age: "30m",
+                    description: "This is the Duncan Student Center.",
+                    latitude: 41.69878133392592,
+                    longitude: -86.23516434558917
+                ),
+                Place(
+                    id: "2",
+                    name: "Hesburgh Library",
+                    age: "30m",
+                    description: "I am taking Hackathon Competition here!",
+                    latitude: 41.70258141723964,
+                    longitude: -86.23419551824554
+                ),
+                Place(
+                    id: "3",
+                    name: "Starbucks",
+                    age: "30m",
+                    description: "The Iced Hazelnut Oatmilk Shaken Espresso is my favorite!",
+                    latitude: 41.702084780632184,
+                    longitude: -86.23757510148786
+                ),
+            ]
+        }
         
     }
 

@@ -10,10 +10,12 @@ import ARKit
 import RealityKit
 import SwiftUI
 import simd
+import FirebaseFirestore
 
 /// SwiftUI wrapper for an `ARView` and all rendering code.
 struct ARViewContainer: UIViewRepresentable {
   @EnvironmentObject var manager: CloudAnchorManager
+    let fireDB: Firestore = Firestore.firestore()
 
   /// Coordinator to act as `ARSessionDelegate` for `ARView`.
   class Coordinator: NSObject, ARSessionDelegate {
@@ -26,6 +28,7 @@ struct ARViewContainer: UIViewRepresentable {
     }
 
     private let manager: CloudAnchorManager
+      private let db: Firestore
     fileprivate let arView = ARView(
       frame: .zero, cameraMode: .ar, automaticallyConfigureSession: false)
     private let worldOrigin = AnchorEntity(world: matrix_identity_float4x4)
@@ -43,8 +46,9 @@ struct ARViewContainer: UIViewRepresentable {
     private var qualityIndicator: QualityIndicator?
     private var startedHosting: Bool = false
 
-    fileprivate init(manager: CloudAnchorManager) {
+      fileprivate init(manager: CloudAnchorManager, db: Firestore) {
       self.manager = manager
+          self.db = db
       super.init()
       // The worldOrigin provides a stable, consistent coordinate system reference point in the AR scene
       // Even as the device moves, this origin remains fixed in the virtual world
@@ -157,34 +161,62 @@ struct ARViewContainer: UIViewRepresentable {
         print("Found GARAnchor with local ID: \(garAnchor.identifier), mapped to cloud ID: \(cloudIdentifier)")
         
         // Get anchor info from UserDefaults
-        var anchorInfoDictionary =
-          (UserDefaults.standard.dictionary(forKey: manager.anchorInfoDictionaryUserDefaultsKey)
-             as? [String: [String: Any]]) ?? [:]
+//        let anchorInfoDictionary =
+//          (UserDefaults.standard.dictionary(forKey: manager.anchorInfoDictionaryUserDefaultsKey)
+//             as? [String: [String: Any]]) ?? [:]
 
         // Debug: list all stored anchor IDs
-        if !anchorInfoDictionary.isEmpty {
-            print("Anchor IDs in UserDefaults:")
-            for (key, _) in anchorInfoDictionary {
-                print("  - \(key)")
-            }
-        }
+//        if !anchorInfoDictionary.isEmpty {
+//            print("Anchor IDs in UserDefaults:")
+//            for (key, _) in anchorInfoDictionary {
+//                print("  - \(key)")
+//            }
+//        }
         
-          guard let info = anchorInfoDictionary[cloudIdentifier] else {
-              print("Cannot find anchor with cloud ID \(cloudIdentifier) in UserDefaults")
-              continue
-          }
+//          guard let info = anchorInfoDictionary[cloudIdentifier] else {
+//              print("Cannot find anchor with cloud ID \(cloudIdentifier) in UserDefaults")
+//              continue
+//          }
+//          
+//          print("Found anchor info for cloud ID: \(cloudIdentifier)")
+//          
+//          //guard let info = anchorInfoDictionary[garidentifier.uuidString] else { print("Cannot find the anchor id in UserDefaults"); continue }
+//          guard let name = info["name"] as? String else { continue }
+//          guard let description = info["description"] as? String else { continue }
+//          guard let imageKey = info["imageKey"] as? String else { continue }
+//
+//          guard let model = CustomAnchorModelUtil.createPaperModelWithImageFromUserDefaults(title:name, description: description, imageKey: imageKey) else {continue}
+//          resolvedModels[garAnchor.identifier] = model
+//          model.transform = Transform(matrix: garAnchor.transform)
+//          worldOrigin.addChild(model)
           
-          print("Found anchor info for cloud ID: \(cloudIdentifier)")
-          
-          //guard let info = anchorInfoDictionary[garidentifier.uuidString] else { print("Cannot find the anchor id in UserDefaults"); continue }
-          guard let name = info["name"] as? String else { continue }
-          guard let description = info["description"] as? String else { continue }
-          guard let imageKey = info["imageKey"] as? String else { continue }
+          // refactor the code to firebase db
+          db.collection("anchors").document(cloudIdentifier).getDocument { [weak self] document, error in
+              guard let self = self else { return } // avoids retain cycles
+              
+              if let error = error {
+                  print("Error fetching anchor: \(error.localizedDescription)")
+                  return
+              }
 
-          guard let model = CustomAnchorModelUtil.createPaperModelWithImageFromUserDefaults(title:name, description: description, imageKey: imageKey) else {continue}
-          resolvedModels[garAnchor.identifier] = model
-          model.transform = Transform(matrix: garAnchor.transform)
-          worldOrigin.addChild(model)
+              guard let document = document, document.exists else {
+                  print("Document with id \(cloudIdentifier) does not exist")
+                  return
+              }
+              
+              guard let info = document.data(),
+                    let name = info["name"] as? String,
+                    let description = info["description"] as? String,
+                    let imageKey = info["imageKey"] as? String,
+                    let model = CustomAnchorModelUtil.createPaperModelWithImageFromUserDefaults(title:name, description: description, imageKey: imageKey) else {
+                  print("Failed to parse anchor fields")
+                  return
+                  }
+              
+              resolvedModels[garAnchor.identifier] = model
+              model.transform = Transform(matrix: garAnchor.transform)
+              worldOrigin.addChild(model)
+          }
       }
 
         // this part is used to host cloud anchor
@@ -213,6 +245,7 @@ struct ARViewContainer: UIViewRepresentable {
   func updateUIView(_ uiView: ARView, context: Context) {}
 
   func makeCoordinator() -> Coordinator {
-    Coordinator(manager: manager)
+      Coordinator(manager: manager, db: fireDB)
+      //Coordinator(manager: manager)
   }
 }
